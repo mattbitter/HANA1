@@ -1,0 +1,106 @@
+select count(*) FROM "t_sr";
+
+DROP FULLTEXT INDEX DEC_IDX;
+
+CREATE FULLTEXT INDEX DEC_IDX ON
+"t_sr"("Description") FAST
+PREPROCESS OFF 
+TEXT ANALYSIS ON
+TEXT MINING ON;
+
+SELECT *
+FROM TM_GET_RELEVANT_TERMS (
+DOCUMENT IN FULLTEXT INDEX WHERE "pk_ID" = 13
+SEARCH "Description" FROM "SYSTEM"."t_sr" 
+RETURN TOP 2000
+) AS T;
+
+CREATE TYPE TT_MT AS TABLE ("RANK" INT, "NORMALIZED_TERM" NVARCHAR(100));
+create table "T_MT" like "TT_MT";
+
+DROP PROCEDURE "P_MT";
+CREATE PROCEDURE "P_MT" (IN    ID2    INTEGER) LANGUAGE SQLSCRIPT AS
+/*********BEGIN PROCEDURE SCRIPT ************/
+BEGIN
+			
+	    --insert into "T_MT" --values (RANK, NORMALIZED_TERM)
+		    OID = SELECT T.RANK, T.NORMALIZED_TERM
+		    FROM TM_GET_RELEVANT_TERMS (
+			DOCUMENT IN FULLTEXT INDEX WHERE "pk_ID" = :ID2
+			SEARCH "Description" FROM "SYSTEM"."t_sr" 
+			RETURN TOP 200
+			) AS T;
+			
+		insert into "T_MT" select * from :OID;
+		
+END;
+
+call "P_MT"(2);
+insert into "T_MT" select * from "P_MT"(1,?);
+
+
+-----
+CREATE FUNCTION scale (val1 INT, val2 INT)
+ RETURNS TABLE (a INT, b INT) LANGUAGE SQLSCRIPT AS
+ BEGIN
+     RETURN SELECT :val1 AS a, :val2 * val1 AS  b FROM DUMMY;
+ END;
+
+
+	SELECT * FROM scale(2,2);
+
+-----
+--copy playing
+DROP PROCEDURE "P_MT2";
+CREATE PROCEDURE "P_MT2" () LANGUAGE SQLSCRIPT AS
+/*********BEGIN PROCEDURE SCRIPT ************/
+BEGIN
+	DECLARE START_ID INT = 1;
+	
+	WHILE (START_ID <= 5)
+	DO
+		call "P_MT"(:START_ID);
+		START_ID = :START_ID + 1;
+	END WHILE;
+
+END;
+
+-----
+
+call "P_MT2"();
+
+--insert into "T_MT" --values (RANK, NORMALIZED_TERM)
+		    SELECT *
+			FROM TM_GET_RELEVANT_TERMS (
+			DOCUMENT IN FULLTEXT INDEX WHERE "pk_ID" = 2
+			SEARCH "Description" FROM "SYSTEM"."t_sr" 
+			RETURN TOP 2000 
+			) AS T;
+			
+			
+			
+			
+----holding
+
+DROP PROCEDURE "P_MT";
+CREATE PROCEDURE "P_MT" () LANGUAGE SQLSCRIPT AS
+/*********BEGIN PROCEDURE SCRIPT ************/
+BEGIN
+	DECLARE START_ID INT = 1;
+	
+	WHILE (START_ID <= 3)
+	DO
+
+	    insert into "T_MT" --values (RANK, NORMALIZED_TERM)
+		    SELECT RANK, NORMALIZED_TERM
+			FROM TM_GET_RELEVANT_TERMS (
+			DOCUMENT IN FULLTEXT INDEX WHERE "pk_ID" =:START_ID
+			SEARCH "Description" FROM "SYSTEM"."t_sr" 
+			RETURN TOP 2000
+			) AS T;
+		
+		START_ID = :START_ID + 1;
+		
+	END WHILE;
+END;
+call "P_MT"();
