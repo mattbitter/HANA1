@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<UDE:Procedure xmlns:UDE="http://www.sap.com/ndb/SQLCoreModelUDE.ecore" schemaVersion="1" id="P_TEST" runWithInvokerPrivileges="false" accessMode="ReadOnly">
+  <origin/>
+  <descriptions defaultDescription="P_TEST"/>
+  <metadata changedAt="2017-02-10 16:27:05.589" createdAt="2017-02-10 16:25:54.045"/>
+  <schema id="_SYS_BIC"/>
+  <definition>
+ /********* Begin Procedure Script ************/ 
+BEGIN 
+
+DECLARE START_I INT = 1;
+
+END;
+ /********* End Procedure Script ************/</definition>
+  <defaultSchema schemaName="SYSTEM"/>
+</UDE:Procedure>
