@@ -91,7 +91,7 @@ ORDER BY "pk_ID", TA_COUNTER;
 ---maybe change config of VOC to max break at one word and then filter on specific types and then use those for columns
 --or use standnd text mining and use the score from the function with another feature from voc on ohw many problems there are
 --after that then do a BPNN and compare the results . also there is a tf-idf table in hana in sps 12
----also maybe try bi grams as well after
+---also maybe try bi grams as well after. convolutional NN are not in HANA
 
 DROP FULLTEXT INDEX DEC_IDX;
 
