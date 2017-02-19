@@ -8,7 +8,7 @@ TEXT ANALYSIS ON
 TEXT MINING ON;
 
 drop type "TT_MT";
-CREATE TYPE TT_MT AS TABLE ("SR" INT, "RANK" INT, "NORMALIZED_TERM" NVARCHAR(100));
+CREATE TYPE TT_MT AS TABLE ("SR" INT, "RANK" DECIMAL, "NORMALIZED_TERM" NVARCHAR(100));
 
 delete from "T_MT";
 drop table "T_MT";
@@ -24,14 +24,12 @@ BEGIN
 			declare OID TT_MT;  
 			--OID = select :ID2 as SR from DUMMY;
 	    --insert into "T_MT" --values (RANK, NORMALIZED_TERM)
-		     OID = SELECT :ID2 as SR, T.RANK, T.NORMALIZED_TERM
+		     OID = SELECT :ID2 as SR, (T.SCORE*100) as RANK, T.NORMALIZED_TERM
 		    FROM TM_GET_RELEVANT_TERMS (
 			DOCUMENT IN FULLTEXT INDEX WHERE "pk_ID" = :ID2
 			SEARCH "Description" FROM "SYSTEM"."t_sr" 
 			RETURN TOP 200
 			) AS T;
-			
-			
 			
 		insert into "T_MT" select * from :OID;
 		
@@ -59,7 +57,21 @@ call "P_MT2"();
 
 ---
 --loop all results and turn into columns then count.
+drop type "TT_LFT";
+CREATE TYPE TT_LFT AS TABLE ("F" NVARCHAR(4), "NORMALIZED_TERM" NVARCHAR(100));
 
+DROP PROCEDURE "P_LFT";	
+CREATE PROCEDURE "P_LFT" () LANGUAGE SQLSCRIPT AS
+BEGIN
+	--declare v_temp TT_LFT;
+	declare i int;
+	declare v int;
+	v_temp = select distinct NORMALIZED_TERM from "SYSTEM"."T_MT" ;
+	select COUNT(*) into v from :v_temp;
+	for i in 1 .. v DO
+		v_out = select i as F, :v_temp.NORMALIZED_TERM[:i] from dummy;
+	END FOR;
+END;
 
 ---select only for testing
 SELECT T.RANK, T.NORMALIZED_TERM
