@@ -60,18 +60,33 @@ call "P_MT2"();
 drop type "TT_LFT";
 CREATE TYPE TT_LFT AS TABLE ("F" NVARCHAR(4), "NORMALIZED_TERM" NVARCHAR(100));
 
+delete from "T_LFT";
+CREATE TABLE "T_LFT" like "TT_LFT";
+
 DROP PROCEDURE "P_LFT";	
 CREATE PROCEDURE "P_LFT" () LANGUAGE SQLSCRIPT AS
 BEGIN
 	--declare v_temp TT_LFT;
-	declare i int;
+	declare i int = 1;
 	declare v int;
+	declare T_LFT TT_LFT;
 	v_temp = select distinct NORMALIZED_TERM from "SYSTEM"."T_MT" ;
-	select COUNT(*) into v from :v_temp;
-	for i in 1 .. v DO
-		v_out = select i as F, :v_temp.NORMALIZED_TERM[:i] from dummy;
-	END FOR;
+	select count (*) into v from :v_temp;
+	begin
+		DECLARE CURSOR cur FOR SELECT * FROM :v_temp;
+		
+		for cur_row as cur DO
+			--v_out = select i as F, cur_row.NORMALIZED_TERM from dummy;
+			insert into "T_LFT" select i as F, cur_row.NORMALIZED_TERM from dummy;
+			i = i + 1;
+		END FOR;
+		
+	end;
+	
+	--upsert into "T_LFT" select * from :v_out;
+	
 END;
+call "P_LFT"();
 
 ---select only for testing
 SELECT T.RANK, T.NORMALIZED_TERM
