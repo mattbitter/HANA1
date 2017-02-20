@@ -56,7 +56,7 @@ call "P_MT2"();
 
 
 ---
---loop all results and turn into columns then count.
+--select distinct values into table.
 drop type "TT_LFT";
 CREATE TYPE TT_LFT AS TABLE ("F" NVARCHAR(4), "NORMALIZED_TERM" NVARCHAR(100));
 
@@ -87,6 +87,36 @@ BEGIN
 	
 END;
 call "P_LFT"();
+
+---transpose the distinct values into a column table using dynamic sql
+drop table "T_TFT";
+CREATE column table "T_TFT" (F1 int);
+
+
+DROP PROCEDURE "P_TFT";	
+CREATE PROCEDURE "P_TFT" () LANGUAGE SQLSCRIPT AS
+BEGIN
+	declare v_cname varchar(2);
+	declare i int = 2;
+	declare v_temp int;
+	select count(*) into v_temp from "SYSTEM"."T_LFT";
+	for i in 2 .. 2 DO
+		v_cname = concat ('F',:i);
+	    call P_DSQL(:v_cname);
+	END FOR;
+END;
+
+DROP PROCEDURE "P_DSQL";	
+CREATE PROCEDURE "P_DSQL" (in string varchar(2)) LANGUAGE SQLSCRIPT AS
+BEGIN
+
+	EXEC 'ALTER TABLE "SYSTEM"."T_TFT" ADD ("'|| :string || '"int)';
+
+END;
+
+ALTER TABLE "SYSTEM"."T_TFT" ADD (F2 int);
+
+call "P_TFT"();
 
 ---select only for testing
 SELECT T.RANK, T.NORMALIZED_TERM
