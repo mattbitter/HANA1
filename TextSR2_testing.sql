@@ -96,18 +96,18 @@ CREATE column table "T_TFT" (F1 int);
 DROP PROCEDURE "P_TFT";	
 CREATE PROCEDURE "P_TFT" () LANGUAGE SQLSCRIPT AS
 BEGIN
-	declare v_cname varchar(2);
-	declare i int = 2;
+	declare v_cname varchar(6);
+	declare i int = 3;
 	declare v_temp int;
 	select count(*) into v_temp from "SYSTEM"."T_LFT";
-	for i in 2 .. 2 DO
+	for i in 3 .. :v_temp DO
 		v_cname = concat ('F',:i);
 	    call P_DSQL(:v_cname);
 	END FOR;
 END;
 
 DROP PROCEDURE "P_DSQL";	
-CREATE PROCEDURE "P_DSQL" (in string varchar(2)) LANGUAGE SQLSCRIPT AS
+CREATE PROCEDURE "P_DSQL" (in string varchar(6)) LANGUAGE SQLSCRIPT AS
 BEGIN
 
 	EXEC 'ALTER TABLE "SYSTEM"."T_TFT" ADD ("'|| :string || '"int)';
@@ -119,6 +119,8 @@ ALTER TABLE "SYSTEM"."T_TFT" ADD (F2 int);
 call "P_TFT"();
 
 ---select only for testing
+select count(*) from "SYSTEM"."T_LFT";
+
 SELECT T.RANK, T.NORMALIZED_TERM
 		    FROM TM_GET_RELEVANT_TERMS (
 			DOCUMENT IN FULLTEXT INDEX WHERE "pk_ID" = 156
