@@ -118,6 +118,8 @@ ALTER TABLE "SYSTEM"."T_TFT" ADD (F2 int);
 
 call "P_TFT"();
 
+--then think how to join the data up withe counts
+
 ---select only for testing
 select count(*) from "SYSTEM"."T_LFT";
 
