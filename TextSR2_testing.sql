@@ -144,6 +144,12 @@ BEGIN
 END;
 call "P_LFT"();
 
+insert into "T_TFT"(SR) VALUES ('2');
+select SR from "T_TFT";
+
+insert into T_TFT(concat('F',select F from "T_LFT" where T_MT(SR)=T_LFT(F))) VALUES (select T_MT(RANK) where T_MT(SR)=T_LFT(F)) where T_TFT(SR) = T_MT(SR);
+
+
 ---select only for testing
 select count(*) from "SYSTEM"."T_TFT";
 
