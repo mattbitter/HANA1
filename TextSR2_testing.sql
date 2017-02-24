@@ -91,7 +91,7 @@ call "P_LFT"();
 ---transpose the distinct values into a column table using dynamic sql
 drop table "T_TFT";
 CREATE column table "T_TFT" (F1 int);
-
+delete from "T_TFT";
 
 DROP PROCEDURE "P_TFT";	
 CREATE PROCEDURE "P_TFT" () LANGUAGE SQLSCRIPT AS
@@ -114,14 +114,38 @@ BEGIN
 
 END;
 
-ALTER TABLE "SYSTEM"."T_TFT" ADD (F2 int);
+ALTER TABLE "SYSTEM"."T_TFT" ADD (SR int);
 
 call "P_TFT"();
 
---then think how to join the data up withe counts
+--create rows of SRs in the feature table - WIP
+DROP PROCEDURE "P_TFT_ROW";	
+CREATE PROCEDURE "P_TFT_ROW" () LANGUAGE SQLSCRIPT AS
+BEGIN
+
+	declare i int = 1;
+	declare v int;
+	select count(*) from "SYSTEM"."t_sr";
+	v = select count(*) from "SYSTEM"."t_sr";
+	--select count (*) into v from :v_temp;
+	begin
+		DECLARE CURSOR cur FOR SELECT * FROM :v;
+		
+		for cur_row as cur DO
+			--v_out = select i as F, cur_row.NORMALIZED_TERM from dummy;
+			insert into "T_LFT" select i as F, cur_row.NORMALIZED_TERM from dummy;
+			i = i + 1;
+		END FOR;
+		
+	end;
+	
+	--upsert into "T_LFT" select * from :v_out;
+	
+END;
+call "P_LFT"();
 
 ---select only for testing
-select count(*) from "SYSTEM"."T_LFT";
+select count(*) from "SYSTEM"."T_TFT";
 
 SELECT T.RANK, T.NORMALIZED_TERM
 		    FROM TM_GET_RELEVANT_TERMS (
