@@ -184,7 +184,7 @@ END;
 call "P_TFT_ROW"();
 
 insert into "T_TFT"(SR) VALUES ('2');
-select SR, F2,F79 from "T_TFT";
+select * from "T_TFT" where SR = 734;
 
 --think how to fix this
 insert into T_TFT(concat('F',select F from "T_LFT" where T_MT(SR)=T_LFT(F))) VALUES (select T_MT(RANK) where T_MT(SR)=T_LFT(F)) where T_TFT(SR) = T_MT(SR);
