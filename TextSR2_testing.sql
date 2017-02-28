@@ -135,7 +135,7 @@ BEGIN
 	declare features nvarchar(10);
 	--select count(*) from "SYSTEM"."t_sr";
 	--select count(*) into v from "SYSTEM"."t_sr";
-	v_temp = select  top 5 SR, NORMALIZED_TERM from "SYSTEM"."T_MT" ;
+	v_temp = select SR, NORMALIZED_TERM from "SYSTEM"."T_MT" ;
 	--select count (*) into v from :v_temp;
 	
 	--assigning the matrix
@@ -185,7 +185,7 @@ call "P_TFT_ROW"();
 
 insert into "T_TFT"(SR) VALUES ('2');
 select * from "T_TFT" where SR = 734;
-
+delete from "T_TFT";
 --think how to fix this
 insert into T_TFT(concat('F',select F from "T_LFT" where T_MT(SR)=T_LFT(F))) VALUES (select T_MT(RANK) where T_MT(SR)=T_LFT(F)) where T_TFT(SR) = T_MT(SR);
 
