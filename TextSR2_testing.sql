@@ -119,22 +119,37 @@ ALTER TABLE "SYSTEM"."T_TFT" ADD (SR int);
 call "P_TFT"();
 
 --create rows of SRs in the feature table - WIP
-DROP PROCEDURE "P_TFT_ROW";	
-CREATE PROCEDURE "P_TFT_ROW" () LANGUAGE SQLSCRIPT AS
+
+
+create column table T_FDUMP (F int);
+select * from "T_FDUMP";
+drop table "T_FDUMP";
+
+DROP PROCEDURE "P_TFT_M";	
+CREATE PROCEDURE "P_TFT_M" () LANGUAGE SQLSCRIPT AS
 BEGIN
 
-	declare i int = 1;
-	declare v int;
-	select count(*) from "SYSTEM"."t_sr";
-	v = select count(*) from "SYSTEM"."t_sr";
+	--declare i int = 1;
+	--declare v int = 0;
+	declare feat nvarchar(10);
+	declare features nvarchar(10);
+	--select count(*) from "SYSTEM"."t_sr";
+	--select count(*) into v from "SYSTEM"."t_sr";
+	v_temp = select  top 5 SR, NORMALIZED_TERM from "SYSTEM"."T_MT" ;
 	--select count (*) into v from :v_temp;
+	
+	--assigning the matrix
 	begin
-		DECLARE CURSOR cur FOR SELECT * FROM :v;
+		DECLARE CURSOR cur FOR SELECT * FROM :v_temp;
 		
 		for cur_row as cur DO
+		    select F into features from "T_LFT" where cur_row.NORMALIZED_TERM="T_LFT".NORMALIZED_TERM;
 			--v_out = select i as F, cur_row.NORMALIZED_TERM from dummy;
-			insert into "T_LFT" select i as F, cur_row.NORMALIZED_TERM from dummy;
-			i = i + 1;
+		    feat = concat('F',:features);
+            
+            EXEC 'update "T_TFT" set '|| :feat ||' = 1 where SR = ' || cur_row.SR;
+            --update "T_TFT" set F1 = 20 where SR = 1;
+            
 		END FOR;
 		
 	end;
@@ -142,10 +157,34 @@ BEGIN
 	--upsert into "T_LFT" select * from :v_out;
 	
 END;
-call "P_LFT"();
+
+call "P_TFT_M"();
+
+
+--create rows
+DROP PROCEDURE "P_TFT_ROW";	
+CREATE PROCEDURE "P_TFT_ROW" () LANGUAGE SQLSCRIPT AS
+BEGIN
+    declare v int;
+    declare i int;
+    select count(*) into v from "SYSTEM"."t_sr";
+    
+    for i in 1 .. :v DO
+        insert into "T_TFT"(SR) VALUES (i);
+    end for;
+
+END;
+
+call "P_TFT_ROW"();
+        insert into "T_TFT"(SR) VALUES (i);
+    end for;
+
+END;
+
+call "P_TFT_ROW"();
 
 insert into "T_TFT"(SR) VALUES ('2');
-select SR from "T_TFT";
+select SR, F2,F79 from "T_TFT";
 
 --think how to fix this
 insert into T_TFT(concat('F',select F from "T_LFT" where T_MT(SR)=T_LFT(F))) VALUES (select T_MT(RANK) where T_MT(SR)=T_LFT(F)) where T_TFT(SR) = T_MT(SR);
