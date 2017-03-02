@@ -129,35 +129,41 @@ DROP PROCEDURE "P_TFT_M";
 CREATE PROCEDURE "P_TFT_M" () LANGUAGE SQLSCRIPT AS
 BEGIN
 
-	--declare i int = 1;
-	--declare v int = 0;
+	declare i int;
+	declare v int;
 	declare feat nvarchar(10);
 	declare features nvarchar(10);
 	declare v_rank int;
+	--declare v_temp TABLE (SR int,RANK dec(34),NORMALIZED_TERM nvarchar(100));
 	--select count(*) from "SYSTEM"."t_sr";
-	--select count(*) into v from "SYSTEM"."t_sr";
-	v_temp = select SR, RANK, NORMALIZED_TERM from "SYSTEM"."T_MT" where SR BETWEEN 10 AND 10;
-	--select count (*) into v from :v_temp;
+	select count(*) into v from "SYSTEM"."t_sr";
 	
-	--assigning the matrix
-	begin
-		DECLARE CURSOR cur FOR SELECT * FROM :v_temp;
-		
-		for cur_row as cur DO
-		    select F into features from "T_LFT" where cur_row.NORMALIZED_TERM="T_LFT".NORMALIZED_TERM;
-			--v_out = select i as F, cur_row.NORMALIZED_TERM from dummy;
-		    feat = concat('F',:features);
-		    v_rank = cur_row.RANK;
-            
-            EXEC 'update "T_TFT" set '|| :feat ||' = '|| :v_rank ||' where SR = ' || cur_row.SR;
-            --update "T_TFT" set F1 = 20 where SR = 1;
-            
-		END FOR;
-		
-	end;
+	for i in 1 .. :v DO
 	
+		--EXEC 'select SR, RANK, NORMALIZED_TERM into '||:v_temp||' from "SYSTEM"."T_MT" where SR = '|| :i;
+		
+		v_temp = select SR, RANK, NORMALIZED_TERM from "SYSTEM"."T_MT" where SR BETWEEN 11 AND 15;
+		--select count (*) into v from :v_temp;
+		
+		--assigning the matrix
+		begin
+			DECLARE CURSOR cur FOR SELECT * FROM :v_temp where SR = :i;
+			
+			for cur_row as cur DO
+			    select F into features from "T_LFT" where cur_row.NORMALIZED_TERM="T_LFT".NORMALIZED_TERM;
+				--v_out = select i as F, cur_row.NORMALIZED_TERM from dummy;
+			    feat = concat('F',:features);
+			    v_rank = cur_row.RANK;
+	            
+	            EXEC 'update "T_TFT" set '|| :feat ||' = '|| :v_rank ||' where SR = ' || cur_row.SR;
+	            --update "T_TFT" set F1 = 20 where SR = 1;
+	            
+			END FOR;
+			
+		end;
+	
+	END FOR;
 	--upsert into "T_LFT" select * from :v_out;
-	
 END;
 
 call "P_TFT_M"();
@@ -180,7 +186,7 @@ END;
 call "P_TFT_ROW"();
 
 insert into "T_TFT"(SR) VALUES ('2');
-select SR,F1,F2,F3,F4,F25,F50 from "T_TFT" where SR = 1;
+select SR,F1,F2,F3,F4,F25,F50 from "T_TFT" where SR = 11;
 select SR from "T_TFT";
 delete from "T_TFT";
 
