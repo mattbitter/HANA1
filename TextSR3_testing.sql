@@ -136,7 +136,7 @@ BEGIN
 	declare v_rank int;
 	--select count(*) from "SYSTEM"."t_sr";
 	--select count(*) into v from "SYSTEM"."t_sr";
-	v_temp = select SR, RANK, NORMALIZED_TERM from "SYSTEM"."T_MT";
+	v_temp = select SR, RANK, NORMALIZED_TERM from "SYSTEM"."T_MT" where SR BETWEEN 10 AND 10;
 	--select count (*) into v from :v_temp;
 	
 	--assigning the matrix
@@ -180,9 +180,10 @@ END;
 call "P_TFT_ROW"();
 
 insert into "T_TFT"(SR) VALUES ('2');
-select SR,F76 from "T_TFT" where SR = 734;
+select SR,F1,F2,F3,F4,F25,F50 from "T_TFT" where SR = 1;
+select SR from "T_TFT";
 delete from "T_TFT";
-select 
+
 --think how to fix this
 insert into T_TFT(concat('F',select F from "T_LFT" where T_MT(SR)=T_LFT(F))) VALUES (select T_MT(RANK) where T_MT(SR)=T_LFT(F)) where T_TFT(SR) = T_MT(SR);
 
