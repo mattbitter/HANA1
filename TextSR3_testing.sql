@@ -138,16 +138,14 @@ BEGIN
 	--select count(*) from "SYSTEM"."t_sr";
 	select count(*) into v from "SYSTEM"."t_sr";
 	
-	for i in 1 .. :v DO
-	
+	for i in 12 .. 20 DO
 		--EXEC 'select SR, RANK, NORMALIZED_TERM into '||:v_temp||' from "SYSTEM"."T_MT" where SR = '|| :i;
-		
-		v_temp = select SR, RANK, NORMALIZED_TERM from "SYSTEM"."T_MT" where SR BETWEEN 11 AND 15;
+		v_temp = select SR, RANK, NORMALIZED_TERM from "SYSTEM"."T_MT" where SR = :i;
 		--select count (*) into v from :v_temp;
 		
 		--assigning the matrix
 		begin
-			DECLARE CURSOR cur FOR SELECT * FROM :v_temp where SR = :i;
+			DECLARE CURSOR cur FOR SELECT * FROM :v_temp;
 			
 			for cur_row as cur DO
 			    select F into features from "T_LFT" where cur_row.NORMALIZED_TERM="T_LFT".NORMALIZED_TERM;
@@ -159,9 +157,7 @@ BEGIN
 	            --update "T_TFT" set F1 = 20 where SR = 1;
 	            
 			END FOR;
-			
 		end;
-	
 	END FOR;
 	--upsert into "T_LFT" select * from :v_out;
 END;
