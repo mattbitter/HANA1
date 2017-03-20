@@ -182,7 +182,7 @@ END;
 call "P_TFT_ROW"();
 
 insert into "T_TFT"(SR) VALUES ('2');
-select SR,F1,F2,F3,F4,F25,F50 from "T_TFT" where SR = 11;
+select SR,F1,F2,F3,F4,F25,F50 from "T_TFT2" where SR = 1;
 select SR from "T_TFT";
 delete from "T_TFT";
 
