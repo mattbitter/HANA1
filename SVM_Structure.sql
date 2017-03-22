@@ -51,3 +51,9 @@ update "T_TFT2" set XVALF = 1 where SR = 695;
 update "T_TFT2" set XVALF = 1 where SR = 719;
 update "T_TFT2" set XVALF = 1 where SR = 730;
 
+CREATE column table T_TFT_DATA like T_TFT2;
+insert into T_TFT_DATA select * from T_TFT2;
+select SR,F1,F2,F3,F4,F25,F50,INCIDENT,XVALF from "T_TFT_DATA" where SR = 37;
+
+alter table "T_TFT_DATA" drop ("COLUMN_1");
+alter table "T_TFT_DATA" drop ("XVALF");
