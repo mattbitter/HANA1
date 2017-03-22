@@ -118,8 +118,8 @@ ALTER TABLE "SYSTEM"."T_TFT" ADD (SR int);
 
 call "P_TFT"();
 
---create rows of SRs in the feature table - WIP
-
+--create rows of SRs in the feature table -
+-- RAN OUT OF MEMORY IN HANA TRIAL, MOVED FUNCTIONALITY TO PYTHON
 
 create column table T_FDUMP (F int);
 select * from "T_FDUMP";
@@ -163,9 +163,9 @@ BEGIN
 END;
 
 call "P_TFT_M"();
+----
 
-
---create rows
+--create rows in T_TFT table
 DROP PROCEDURE "P_TFT_ROW";	
 CREATE PROCEDURE "P_TFT_ROW" () LANGUAGE SQLSCRIPT AS
 BEGIN
@@ -182,12 +182,19 @@ END;
 call "P_TFT_ROW"();
 
 insert into "T_TFT"(SR) VALUES ('2');
-select SR,F1,F2,F3,F4,F25,F50 from "T_TFT2" where SR = 1;
+
 select SR from "T_TFT";
 delete from "T_TFT";
 
---think how to fix this
-insert into T_TFT(concat('F',select F from "T_LFT" where T_MT(SR)=T_LFT(F))) VALUES (select T_MT(RANK) where T_MT(SR)=T_LFT(F)) where T_TFT(SR) = T_MT(SR);
+--AFTER PYTHON CODE I CREATED T_TFT2 and loaded it manually because of 1000 column limit in sqlalchemy connection
+select SR,F1,F2,F3,F4,F25,F50 from "T_TFT2" where SR = 1;
+
+
+---START SVM modeling
+select SR,F1,F2,F3,F4,F25,F50 from "T_TFT2" where SR = 1;
+
+ALTER TABLE "SYSTEM"."T_TFT2" ADD (INCIDENT int);
+ALTER TABLE "SYSTEM"."T_TFT2" ADD (XVALF int);
 
 
 ---select only for testing
