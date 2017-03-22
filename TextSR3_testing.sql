@@ -191,7 +191,7 @@ select SR,F1,F2,F3,F4,F25,F50 from "T_TFT2" where SR = 1;
 
 
 ---START SVM modeling
-select SR,F1,F2,F3,F4,F25,F50 from "T_TFT2" where SR = 1;
+select SR,F1,F2,F3,F4,F25,F50,INCIDENT,XVALF from "T_TFT2" where SR = 37;
 
 ALTER TABLE "SYSTEM"."T_TFT2" ADD (INCIDENT int);
 ALTER TABLE "SYSTEM"."T_TFT2" ADD (XVALF int);
